@@ -16,6 +16,9 @@ WIDTH = 1920
 HEIGHT = 1080
 
 HEAD_CENTER = [1008, 437]
+HEAD_ROTATION = 10.0 * math.pi / 180.0
+HEAD_ROTATION_TIME = 1.0
+FRAME_RATE = 30
 
 def render_sub(rsvg, cr, id_name):
     res = rsvg.render_cairo_sub(cr, id_name)
@@ -51,7 +54,7 @@ ffout = subprocess.Popen(["ffmpeg",
                           "-pixel_format", "rgb24",
                           "-video_size", "{}x{}".format(surface.get_width(),
                                                         surface.get_height()),
-                          "-framerate", "30",
+                          "-framerate", str(FRAME_RATE),
                           "-i", "-",
                           "-c:v", "libvpx",
                           "-b:v", "3M",
@@ -60,13 +63,19 @@ ffout = subprocess.Popen(["ffmpeg",
                          stdin = subprocess.PIPE)
 
 for frame_num in range(100):
+    elapsed_time = frame_num / FRAME_RATE
+
     cr.set_source_rgb(1, 1, 1)
     cr.paint()
 
     render_sub(elephant_svg, cr, "#layer1")
 
     cr.save()
-    rotate_about(cr, *HEAD_CENTER, angle = frame_num * math.pi * 2.0 / 60.0)
+    rotate_about(cr,
+                 *HEAD_CENTER,
+                 angle = HEAD_ROTATION *
+                 math.sin(elapsed_time * math.pi * 2.0 /
+                          HEAD_ROTATION_TIME))
     render_sub(elephant_svg, cr, "#layer4")
     cr.restore()
 

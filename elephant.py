@@ -29,6 +29,10 @@ FOREGROUND_SIZE = 4038.071
 
 MEZGROUND_SIZE = 3070
 
+BALLOON_DISAPPEAR_TIME = 3.0
+# Pixels per second per second
+BALLOON_ACCELERATION = HEIGHT / 2
+
 def rotate_point(angle, x, y):
     s = math.sin(angle)
     c = math.cos(angle)
@@ -121,12 +125,20 @@ for frame_num in range(800):
     render_sub(elephant_svg, cr, "#layer4")
     cr.restore()
 
-    nose_point = rotate_point(-rotation_angle,
-                              BALLOON_NOSE_POINT[0] - HEAD_CENTER[0],
-                              BALLOON_NOSE_POINT[1] - HEAD_CENTER[1])
+    if elapsed_time < BALLOON_DISAPPEAR_TIME:
+        nose_point = rotate_point(-rotation_angle,
+                                  BALLOON_NOSE_POINT[0] - HEAD_CENTER[0],
+                                  BALLOON_NOSE_POINT[1] - HEAD_CENTER[1])
+        balloon_pos = (HEAD_CENTER[0] + nose_point[0],
+                       HEIGHT - 1 - (HEAD_CENTER[1] + nose_point[1]))
+        balloon_base = (balloon_pos[0] + camera_pos, balloon_pos[1])
+    else:
+        time_delta = elapsed_time - BALLOON_DISAPPEAR_TIME
+        y_offset = time_delta * time_delta * BALLOON_ACCELERATION / 2.0
+        balloon_pos = (balloon_base[0] - camera_pos, balloon_base[1] - y_offset)
+
     cr.save()
-    cr.translate(HEAD_CENTER[0] + nose_point[0],
-                 HEIGHT - 1 - (HEAD_CENTER[1] + nose_point[1]))
+    cr.translate(*balloon_pos)
     render_sub(elephant_svg, cr, "#layer7")
     cr.restore()
 

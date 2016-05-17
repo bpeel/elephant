@@ -81,7 +81,7 @@ input_args = ["-f", "rawvideo",
 output_args = ["-c:v", "libvpx",
                "-b:v", "3M",
                "-y",
-               "elephant.webm"]
+               "elephant-no-sound.webm"]
 
 if play_video:
     args = ['ffplay'] + input_args
@@ -145,3 +145,16 @@ ffout.stdin.close()
 
 if ffout.wait() != 0:
     raise Exception("convert failed")
+
+if not play_video:
+    ret = subprocess.call(["ffmpeg",
+                           "-i", "elephant-no-sound.webm",
+                           "-i", "021914bgm2(happytune).mp3",
+                           "-shortest",
+                           "-c:v", "copy",
+                           "-c:a", "libvorbis",
+                           "-aq", "4",
+                           "-y",
+                           "elephant.webm"])
+    if ret != 0:
+        raise Exception("ffmpeg failed")

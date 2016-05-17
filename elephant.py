@@ -23,6 +23,8 @@ FRAME_RATE = 30
 
 ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
 
+FOREGROUND_SIZE = 4038.071
+
 def render_sub(rsvg, cr, id_name):
     res = rsvg.render_cairo_sub(cr, id_name)
     if not res:
@@ -81,8 +83,9 @@ ffout = subprocess.Popen(args, stdin = subprocess.PIPE)
 for frame_num in range(100):
     elapsed_time = frame_num / FRAME_RATE
 
-    cr.set_source_rgb(1, 1, 1)
-    cr.paint()
+    camera_pos = elapsed_time * 300
+
+    render_sub(elephant_svg, cr, "#layer3")
 
     rotation_sin = math.sin(elapsed_time * math.pi * 2.0 /
                             HEAD_ROTATION_TIME)
@@ -96,6 +99,15 @@ for frame_num in range(100):
     cr.save()
     rotate_about(cr, *HEAD_CENTER, angle = HEAD_ROTATION * rotation_sin)
     render_sub(elephant_svg, cr, "#layer4")
+    cr.restore()
+
+    foreground_pos = camera_pos * 1.4
+    inner_pos = foreground_pos % FOREGROUND_SIZE
+    cr.save()
+    cr.translate(-inner_pos, 0.0)
+    render_sub(elephant_svg, cr, "#layer5")
+    cr.translate(FOREGROUND_SIZE, 0.0)
+    render_sub(elephant_svg, cr, "#layer5")
     cr.restore()
 
     write_frame(ffout, surface)

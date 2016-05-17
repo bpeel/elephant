@@ -21,6 +21,8 @@ HEAD_ROTATION = 10.0 * math.pi / 180.0
 HEAD_ROTATION_TIME = 1.0
 FRAME_RATE = 30
 
+ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
+
 def render_sub(rsvg, cr, id_name):
     res = rsvg.render_cairo_sub(cr, id_name)
     if not res:
@@ -82,14 +84,17 @@ for frame_num in range(100):
     cr.set_source_rgb(1, 1, 1)
     cr.paint()
 
-    render_sub(elephant_svg, cr, "#layer1")
+    rotation_sin = math.sin(elapsed_time * math.pi * 2.0 /
+                            HEAD_ROTATION_TIME)
+
+    frame_num = min(len(ELEPHANT_FRAMES) - 1,
+                    max(int((rotation_sin / 2.0 + 0.5) *
+                        (len(ELEPHANT_FRAMES) - 1) + 0.5), 0))
+
+    render_sub(elephant_svg, cr, "#" + ELEPHANT_FRAMES[frame_num])
 
     cr.save()
-    rotate_about(cr,
-                 *HEAD_CENTER,
-                 angle = HEAD_ROTATION *
-                 math.sin(elapsed_time * math.pi * 2.0 /
-                          HEAD_ROTATION_TIME))
+    rotate_about(cr, *HEAD_CENTER, angle = HEAD_ROTATION * rotation_sin)
     render_sub(elephant_svg, cr, "#layer4")
     cr.restore()
 

@@ -21,11 +21,19 @@ HEAD_ROTATION = 10.0 * math.pi / 180.0
 HEAD_ROTATION_TIME = 1.0
 FRAME_RATE = 30
 
+BALLOON_NOSE_POINT = (1019, 221)
+
 ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
 
 FOREGROUND_SIZE = 4038.071
 
 MEZGROUND_SIZE = 3070
+
+def rotate_point(angle, x, y):
+    s = math.sin(angle)
+    c = math.cos(angle)
+    return (x * c - y * s,
+            x * s + y * c)
 
 def render_sub(rsvg, cr, id_name):
     res = rsvg.render_cairo_sub(cr, id_name)
@@ -100,6 +108,7 @@ for frame_num in range(100):
 
     rotation_sin = math.sin(elapsed_time * math.pi * 2.0 /
                             HEAD_ROTATION_TIME)
+    rotation_angle = HEAD_ROTATION * rotation_sin
 
     frame_num = min(len(ELEPHANT_FRAMES) - 1,
                     max(int((rotation_sin / 2.0 + 0.5) *
@@ -108,8 +117,17 @@ for frame_num in range(100):
     render_sub(elephant_svg, cr, "#" + ELEPHANT_FRAMES[frame_num])
 
     cr.save()
-    rotate_about(cr, *HEAD_CENTER, angle = HEAD_ROTATION * rotation_sin)
+    rotate_about(cr, *HEAD_CENTER, angle = rotation_angle)
     render_sub(elephant_svg, cr, "#layer4")
+    cr.restore()
+
+    nose_point = rotate_point(-rotation_angle,
+                              BALLOON_NOSE_POINT[0] - HEAD_CENTER[0],
+                              BALLOON_NOSE_POINT[1] - HEAD_CENTER[1])
+    cr.save()
+    cr.translate(HEAD_CENTER[0] + nose_point[0],
+                 HEIGHT - 1 - (HEAD_CENTER[1] + nose_point[1]))
+    render_sub(elephant_svg, cr, "#layer7")
     cr.restore()
 
     foreground_pos = camera_pos * 1.4

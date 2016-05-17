@@ -25,6 +25,8 @@ ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
 
 FOREGROUND_SIZE = 4038.071
 
+MEZGROUND_SIZE = 3070
+
 def render_sub(rsvg, cr, id_name):
     res = rsvg.render_cairo_sub(cr, id_name)
     if not res:
@@ -86,6 +88,15 @@ for frame_num in range(100):
     camera_pos = elapsed_time * 300
 
     render_sub(elephant_svg, cr, "#layer3")
+
+    mezground_pos = camera_pos
+    inner_pos = mezground_pos % MEZGROUND_SIZE
+    cr.save()
+    cr.translate(-inner_pos, 0.0)
+    render_sub(elephant_svg, cr, "#layer6")
+    cr.translate(MEZGROUND_SIZE, 0.0)
+    render_sub(elephant_svg, cr, "#layer6")
+    cr.restore()
 
     rotation_sin = math.sin(elapsed_time * math.pi * 2.0 /
                             HEAD_ROTATION_TIME)

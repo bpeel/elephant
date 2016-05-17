@@ -10,6 +10,7 @@ import math
 import subprocess
 import shutil
 import os
+import sys
 
 SCALE = 4
 WIDTH = 1920
@@ -41,6 +42,14 @@ def write_frame(ffout, surface):
         raise Exception("convert failed")
     os.unlink('result.png')
 
+if len(sys.argv) == 2 and sys.argv[1] == '-p':
+    play_video = True
+elif len(sys.argv) == 1:
+    play_video = False
+else:
+    sys.stderr.write("usage: {} [-p]\n".format(sys.argv[0]))
+    sys.exit(1)
+
 elephant_svg = Rsvg.Handle.new_from_file('elephant.svg')
 
 surface = cairo.ImageSurface(cairo.FORMAT_RGB24,
@@ -49,18 +58,23 @@ surface = cairo.ImageSurface(cairo.FORMAT_RGB24,
 cr = cairo.Context(surface)
 cr.scale(1.0 / SCALE, 1.0 / SCALE)
 
-ffout = subprocess.Popen(["ffmpeg",
-                          "-f", "rawvideo",
-                          "-pixel_format", "rgb24",
-                          "-video_size", "{}x{}".format(surface.get_width(),
-                                                        surface.get_height()),
-                          "-framerate", str(FRAME_RATE),
-                          "-i", "-",
-                          "-c:v", "libvpx",
-                          "-b:v", "3M",
-                          "-y",
-                          "elephant.webm"],
-                         stdin = subprocess.PIPE)
+input_args = ["-f", "rawvideo",
+              "-pixel_format", "rgb24",
+              "-video_size", "{}x{}".format(surface.get_width(),
+                                            surface.get_height()),
+              "-framerate", str(FRAME_RATE),
+              "-i", "-"]
+output_args = ["-c:v", "libvpx",
+               "-b:v", "3M",
+               "-y",
+               "elephant.webm"]
+
+if play_video:
+    args = ['ffplay'] + input_args
+else:
+    args = ['ffmpeg'] + input_args + output_args
+
+ffout = subprocess.Popen(args, stdin = subprocess.PIPE)
 
 for frame_num in range(100):
     elapsed_time = frame_num / FRAME_RATE

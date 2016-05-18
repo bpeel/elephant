@@ -23,6 +23,10 @@ FRAME_RATE = 30
 
 BALLOON_NOSE_POINT = (1019, 221)
 
+RHINO_TAIL_POINT = (1496, 651)
+RHINO_TAIL_ROTATION = 5.0 * math.pi / 180.0
+RHINO_POS = WIDTH * 1.5
+
 ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
 
 FOREGROUND_SIZE = 4038.071
@@ -112,6 +116,18 @@ for frame_num in range(800):
 
     rotation_sin = math.sin(elapsed_time * math.pi * 2.0 /
                             HEAD_ROTATION_TIME)
+
+    cr.save()
+    cr.translate(RHINO_POS - camera_pos, 0.0)
+    cr.save()
+    rotate_about(cr,
+                 *RHINO_TAIL_POINT,
+                 angle = RHINO_TAIL_ROTATION * rotation_sin)
+    render_sub(elephant_svg, cr, "#layer9")
+    cr.restore()
+    render_sub(elephant_svg, cr, "#layer8")
+    cr.restore()
+
     rotation_angle = HEAD_ROTATION * rotation_sin
 
     frame_num = min(len(ELEPHANT_FRAMES) - 1,

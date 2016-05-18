@@ -34,8 +34,10 @@ FOREGROUND_SIZE = 4038.071
 MEZGROUND_SIZE = 3070
 
 BALLOON_DISAPPEAR_TIME = 3.0
-# Pixels per second per second
+# Pixels per secqond per second
 BALLOON_ACCELERATION = HEIGHT / 2
+
+PAUSES = [(11, 3)]
 
 def rotate_point(angle, x, y):
     s = math.sin(angle)
@@ -101,7 +103,19 @@ ffout = subprocess.Popen(args, stdin = subprocess.PIPE)
 for frame_num in range(800):
     elapsed_time = frame_num / FRAME_RATE
 
-    camera_pos = elapsed_time * 300
+    camera_time = elapsed_time
+    in_pause = False
+
+    for pause in PAUSES:
+        if elapsed_time >= pause[0]:
+            if elapsed_time >= pause[0] + pause[1]:
+                camera_time -= pause[1]
+            else:
+                in_pause = True
+                camera_time = pause[0]
+                break
+
+    camera_pos = camera_time * 300
 
     render_sub(elephant_svg, cr, "#layer3")
 
@@ -128,7 +142,11 @@ for frame_num in range(800):
     render_sub(elephant_svg, cr, "#layer8")
     cr.restore()
 
-    rotation_angle = HEAD_ROTATION * rotation_sin
+    if in_pause:
+        rotation_angle = 0
+        rotation_sin = 0
+    else:
+        rotation_angle = HEAD_ROTATION * rotation_sin
 
     frame_num = min(len(ELEPHANT_FRAMES) - 1,
                     max(int((rotation_sin / 2.0 + 0.5) *

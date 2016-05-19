@@ -27,10 +27,16 @@ RHINO_TAIL_POINT = (1496, 651)
 RHINO_TAIL_ROTATION = 5.0 * math.pi / 180.0
 RHINO_POS = WIDTH * 1.5
 
+RHINO_ENTRY_START = -2343
+RHINO_ENTRY_END = -1477
+
 ALLIGATOR_POS = WIDTH * 3.0
 ALLIGATOR_HEAD_POINT = (1026, 357)
 ALLIGATOR_ROTATION = 30.0 * math.pi / 180.0
 ALLIGATOR_ROTATE_TIME = (22, 3)
+
+ALLIGATOR_ENTRY_START = 1115
+ENTRY_TIME = (34, 3)
 
 MONKEY_POS = WIDTH * 4.0
 MONKEY_HAND_POINT = (1150, 870)
@@ -143,36 +149,6 @@ for frame_num in range(1600):
     rotation_sin = math.sin(elapsed_time * math.pi * 2.0 /
                             HEAD_ROTATION_TIME)
 
-    cr.save()
-    cr.translate(RHINO_POS - camera_pos, 0.0)
-    cr.save()
-    rotate_about(cr,
-                 *RHINO_TAIL_POINT,
-                 angle = RHINO_TAIL_ROTATION * rotation_sin)
-    render_sub(elephant_svg, cr, "#layer9")
-    cr.restore()
-    render_sub(elephant_svg, cr, "#layer8")
-    cr.restore()
-
-    cr.save()
-    cr.translate(ALLIGATOR_POS - camera_pos, 0.0)
-    # bodge to cover up the join on the alligator head
-    render_sub(elephant_svg, cr, "#layer13")
-    # alligator head
-    cr.save()
-    if (elapsed_time >= ALLIGATOR_ROTATE_TIME[0] and
-        elapsed_time < ALLIGATOR_ROTATE_TIME[1] + ALLIGATOR_ROTATE_TIME[0]):
-        angle = math.sin((elapsed_time - ALLIGATOR_ROTATE_TIME[0]) * math.pi /
-                         ALLIGATOR_ROTATE_TIME[1]) * ALLIGATOR_ROTATION
-        rotate_about(cr,
-                     *ALLIGATOR_HEAD_POINT,
-                     angle = angle)
-    render_sub(elephant_svg, cr, "#layer12")
-    cr.restore()
-    # alligator body
-    render_sub(elephant_svg, cr, "#layer11")
-    cr.restore()
-
     monkey_angle = rotation_sin * MONKEY_ROTATION
 
     cr.save()
@@ -188,6 +164,55 @@ for frame_num in range(1600):
     cr.restore()
     # monkey hand
     render_sub(elephant_svg, cr, "#layer15")
+    cr.restore()
+
+    cr.save()
+    if elapsed_time >= ENTRY_TIME[0]:
+        if elapsed_time >= ENTRY_TIME[0] + ENTRY_TIME[1]:
+            rhino_pos = RHINO_ENTRY_END
+        else:
+            rhino_pos = ((elapsed_time - ENTRY_TIME[0]) *
+                         (RHINO_ENTRY_END - RHINO_ENTRY_START) /
+                         ENTRY_TIME[1] +
+                         RHINO_ENTRY_START)
+    else:
+        rhino_pos = RHINO_POS - camera_pos
+    cr.translate(rhino_pos, 0.0)
+    cr.save()
+    rotate_about(cr,
+                 *RHINO_TAIL_POINT,
+                 angle = RHINO_TAIL_ROTATION * rotation_sin)
+    render_sub(elephant_svg, cr, "#layer9")
+    cr.restore()
+    render_sub(elephant_svg, cr, "#layer8")
+    cr.restore()
+
+    cr.save()
+    if elapsed_time >= ENTRY_TIME[0]:
+        if elapsed_time >= ENTRY_TIME[0] + ENTRY_TIME[1]:
+            alligator_pos = 0
+        else:
+            alligator_pos = ((ENTRY_TIME[0] + ENTRY_TIME[1] - elapsed_time) *
+                             ALLIGATOR_ENTRY_START /
+                             ENTRY_TIME[1])
+    else:
+        alligator_pos = ALLIGATOR_POS - camera_pos
+    cr.translate(alligator_pos, 0.0)
+    # bodge to cover up the join on the alligator head
+    render_sub(elephant_svg, cr, "#layer13")
+    # alligator head
+    cr.save()
+    if (elapsed_time >= ALLIGATOR_ROTATE_TIME[0] and
+        elapsed_time < ALLIGATOR_ROTATE_TIME[1] + ALLIGATOR_ROTATE_TIME[0]):
+        angle = math.sin((elapsed_time - ALLIGATOR_ROTATE_TIME[0]) * math.pi /
+                         ALLIGATOR_ROTATE_TIME[1]) * ALLIGATOR_ROTATION
+        rotate_about(cr,
+                     *ALLIGATOR_HEAD_POINT,
+                     angle = angle)
+    render_sub(elephant_svg, cr, "#layer12")
+    cr.restore()
+    # alligator body
+    render_sub(elephant_svg, cr, "#layer11")
     cr.restore()
 
     if in_pause:

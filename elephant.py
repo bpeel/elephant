@@ -32,6 +32,8 @@ ALLIGATOR_HEAD_POINT = (1026, 357)
 ALLIGATOR_ROTATION = 30.0 * math.pi / 180.0
 ALLIGATOR_ROTATE_TIME = (22, 3)
 
+MONKEY_POS = WIDTH * 4.0
+
 ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
 
 FOREGROUND_SIZE = 4038.071
@@ -105,7 +107,7 @@ else:
 
 ffout = subprocess.Popen(args, stdin = subprocess.PIPE)
 
-for frame_num in range(800):
+for frame_num in range(1600):
     elapsed_time = frame_num / FRAME_RATE
 
     camera_time = elapsed_time
@@ -164,6 +166,11 @@ for frame_num in range(800):
     cr.restore()
     # alligator body
     render_sub(elephant_svg, cr, "#layer11")
+    cr.restore()
+
+    cr.save()
+    cr.translate(MONKEY_POS - camera_pos, 0.0)
+    render_sub(elephant_svg, cr, "#layer14")
     cr.restore()
 
     if in_pause:

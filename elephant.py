@@ -33,6 +33,9 @@ ALLIGATOR_ROTATION = 30.0 * math.pi / 180.0
 ALLIGATOR_ROTATE_TIME = (22, 3)
 
 MONKEY_POS = WIDTH * 4.0
+MONKEY_HAND_POINT = (1150, 870)
+MONKEY_HOLD_POINT = (1015, 395)
+MONKEY_ROTATION = 10.0 * math.pi / 180.0
 
 ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
 
@@ -44,7 +47,7 @@ BALLOON_DISAPPEAR_TIME = 3.0
 # Pixels per secqond per second
 BALLOON_ACCELERATION = HEIGHT / 2
 
-PAUSES = [(11, 3), (22, 3)]
+PAUSES = [(11, 3), (22, 3), (32, 3)]
 
 def rotate_point(angle, x, y):
     s = math.sin(angle)
@@ -168,9 +171,21 @@ for frame_num in range(1600):
     render_sub(elephant_svg, cr, "#layer11")
     cr.restore()
 
+    monkey_angle = rotation_sin * MONKEY_ROTATION
+
     cr.save()
     cr.translate(MONKEY_POS - camera_pos, 0.0)
+    # monkey tree
+    render_sub(elephant_svg, cr, "#layer16")
+    # monkey body
+    cr.save()
+    rotate_about(cr,
+                 *MONKEY_HAND_POINT,
+                 angle = monkey_angle)
     render_sub(elephant_svg, cr, "#layer14")
+    cr.restore()
+    # monkey hand
+    render_sub(elephant_svg, cr, "#layer15")
     cr.restore()
 
     if in_pause:
@@ -196,6 +211,14 @@ for frame_num in range(1600):
                                   BALLOON_NOSE_POINT[1] - HEAD_CENTER[1])
         balloon_pos = (HEAD_CENTER[0] + nose_point[0],
                        HEIGHT - 1 - (HEAD_CENTER[1] + nose_point[1]))
+        balloon_base = (balloon_pos[0] + camera_pos, balloon_pos[1])
+    elif camera_pos >= ALLIGATOR_POS:
+        hold_point = rotate_point(-monkey_angle,
+                                  MONKEY_HOLD_POINT[0] - MONKEY_HAND_POINT[0],
+                                  MONKEY_HOLD_POINT[1] - MONKEY_HAND_POINT[1])
+        balloon_pos = (MONKEY_HAND_POINT[0] + MONKEY_POS -
+                       camera_pos + hold_point[0],
+                       HEIGHT - 1 - (MONKEY_HAND_POINT[1] + hold_point[1]))
         balloon_base = (balloon_pos[0] + camera_pos, balloon_pos[1])
     else:
         time_delta = elapsed_time - BALLOON_DISAPPEAR_TIME

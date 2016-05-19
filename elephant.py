@@ -118,7 +118,7 @@ else:
 
 ffout = subprocess.Popen(args, stdin = subprocess.PIPE)
 
-for frame_num in range(1600):
+for frame_num in range((sum(ENTRY_TIME) + 1) * FRAME_RATE):
     elapsed_time = frame_num / FRAME_RATE
 
     camera_time = elapsed_time

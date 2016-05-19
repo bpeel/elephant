@@ -112,7 +112,7 @@ for frame_num in range(800):
                 camera_time -= pause[1]
             else:
                 in_pause = True
-                camera_time = pause[0]
+                camera_time -= elapsed_time - pause[0]
                 break
 
     camera_pos = camera_time * 300

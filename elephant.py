@@ -47,7 +47,9 @@ BALLOON_DISAPPEAR_TIME = 3.0
 # Pixels per secqond per second
 BALLOON_ACCELERATION = HEIGHT / 2
 
-PAUSES = [(11, 3), (22, 3), (32, 3)]
+BALLOON_PASSOVER_TIME = (32, 1)
+
+PAUSES = [(11, 3), (22, 3), (32, 300)]
 
 def rotate_point(angle, x, y):
     s = math.sin(angle)
@@ -212,6 +214,19 @@ for frame_num in range(1600):
         balloon_pos = (HEAD_CENTER[0] + nose_point[0],
                        HEIGHT - 1 - (HEAD_CENTER[1] + nose_point[1]))
         balloon_base = (balloon_pos[0] + camera_pos, balloon_pos[1])
+    elif elapsed_time >= BALLOON_PASSOVER_TIME[0]:
+        target = (BALLOON_NOSE_POINT[0], HEIGHT - 1 - BALLOON_NOSE_POINT[1])
+        if elapsed_time >= BALLOON_PASSOVER_TIME[0] + BALLOON_PASSOVER_TIME[1]:
+            balloon_pos = target
+        else:
+            fraction = ((elapsed_time - BALLOON_PASSOVER_TIME[0]) /
+                    BALLOON_PASSOVER_TIME[1])
+            fraction = math.sin(fraction * math.pi / 2.0)
+
+            balloon_pos = ((target[0] - balloon_base[0]) *
+                           fraction + balloon_base[0],
+                           (target[1] - balloon_base[1]) *
+                           fraction + balloon_base[1])
     elif camera_pos >= ALLIGATOR_POS:
         hold_point = rotate_point(-monkey_angle,
                                   MONKEY_HOLD_POINT[0] - MONKEY_HAND_POINT[0],
@@ -219,7 +234,7 @@ for frame_num in range(1600):
         balloon_pos = (MONKEY_HAND_POINT[0] + MONKEY_POS -
                        camera_pos + hold_point[0],
                        HEIGHT - 1 - (MONKEY_HAND_POINT[1] + hold_point[1]))
-        balloon_base = (balloon_pos[0] + camera_pos, balloon_pos[1])
+        balloon_base = (balloon_pos[0], balloon_pos[1])
     else:
         time_delta = elapsed_time - BALLOON_DISAPPEAR_TIME
         y_offset = time_delta * time_delta * BALLOON_ACCELERATION / 2.0

@@ -215,6 +215,12 @@ for frame_num in range(1600):
     render_sub(elephant_svg, cr, "#layer11")
     cr.restore()
 
+    if elapsed_time >= ENTRY_TIME[0]:
+        cr.save()
+        cr.translate(alligator_pos, 0.0)
+        render_sub(elephant_svg, cr, "#layer17")
+        cr.restore()
+
     if in_pause:
         rotation_angle = 0
         rotation_sin = 0

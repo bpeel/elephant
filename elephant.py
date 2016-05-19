@@ -27,6 +27,11 @@ RHINO_TAIL_POINT = (1496, 651)
 RHINO_TAIL_ROTATION = 5.0 * math.pi / 180.0
 RHINO_POS = WIDTH * 1.5
 
+ALLIGATOR_POS = WIDTH * 3.0
+ALLIGATOR_HEAD_POINT = (1026, 357)
+ALLIGATOR_ROTATION = 30.0 * math.pi / 180.0
+ALLIGATOR_ROTATE_TIME = (22, 3)
+
 ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
 
 FOREGROUND_SIZE = 4038.071
@@ -37,7 +42,7 @@ BALLOON_DISAPPEAR_TIME = 3.0
 # Pixels per secqond per second
 BALLOON_ACCELERATION = HEIGHT / 2
 
-PAUSES = [(11, 3)]
+PAUSES = [(11, 3), (22, 3)]
 
 def rotate_point(angle, x, y):
     s = math.sin(angle)
@@ -140,6 +145,25 @@ for frame_num in range(800):
     render_sub(elephant_svg, cr, "#layer9")
     cr.restore()
     render_sub(elephant_svg, cr, "#layer8")
+    cr.restore()
+
+    cr.save()
+    cr.translate(ALLIGATOR_POS - camera_pos, 0.0)
+    # bodge to cover up the join on the alligator head
+    render_sub(elephant_svg, cr, "#layer13")
+    # alligator head
+    cr.save()
+    if (elapsed_time >= ALLIGATOR_ROTATE_TIME[0] and
+        elapsed_time < ALLIGATOR_ROTATE_TIME[1] + ALLIGATOR_ROTATE_TIME[0]):
+        angle = math.sin((elapsed_time - ALLIGATOR_ROTATE_TIME[0]) * math.pi /
+                         ALLIGATOR_ROTATE_TIME[1]) * ALLIGATOR_ROTATION
+        rotate_about(cr,
+                     *ALLIGATOR_HEAD_POINT,
+                     angle = angle)
+    render_sub(elephant_svg, cr, "#layer12")
+    cr.restore()
+    # alligator body
+    render_sub(elephant_svg, cr, "#layer11")
     cr.restore()
 
     if in_pause:

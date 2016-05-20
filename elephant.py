@@ -145,6 +145,18 @@ if not play_video:
 
     subprocess.check_call(args)
 
+    subprocess.check_call(["ffmpeg",
+                           "-i", "021914bgm2(happytune).mp3",
+                           "-ar", "44100",
+                           "-y",
+                           "music.flac"])
+
+    subprocess.check_call(["sox",
+                           "--combine", "mix",
+                           "-v", "0.3",
+                           "music.flac", "audio.flac", "soundtrack.flac",
+                           "norm"])
+
 with open("rough-subtitles.srt", mode="w", encoding="utf-8") as srt_out:
     i = 1
     for audio in AUDIO_TIMES:
@@ -424,7 +436,7 @@ if ffout.wait() != 0:
 if not play_video:
     ret = subprocess.call(["ffmpeg",
                            "-i", "elephant-no-sound.webm",
-                           "-i", "021914bgm2(happytune).mp3",
+                           "-i", "soundtrack.flac",
                            "-shortest",
                            "-c:v", "copy",
                            "-c:a", "libvorbis",

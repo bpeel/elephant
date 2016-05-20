@@ -64,6 +64,22 @@ CREDIT_TIME = 3
 CREDIT_SLIDE_TIME = 1
 N_CREDITS = 5
 
+AUDIO_TIMES = [ ( 0, "title.flac" ),
+                ( TITLE_TIME, "jen-elephanto.flac" ),
+                ( TITLE_TIME + 1.4, "la-elephanto-havas-balonon.flac" ),
+                ( BALLOON_DISAPPEAR_TIME + 0.5, "ho-la-balono-malaperis.flac" ),
+                ( BALLOON_DISAPPEAR_TIME + 0.5 + 2.35,
+                  "kie-estas-la-balono.flac" ),
+                ( 14, "ĉu-ĝi-estas-malantaŭ-la-rinocero.flac" ),
+                ( 17, "ne-1.flac" ),
+                ( ALLIGATOR_ROTATE_TIME[0],
+                  "ĉu-ĝi-estas-en-la-buŝo-de-la-aligatoro.flac" ),
+                ( sum(ALLIGATOR_ROTATE_TIME), "ne-2.flac" ),
+                ( 32, "ho-la-simio-havas-ĝin-en-la-arbo.flac" ),
+                ( BALLOON_PASSOVER_TIME[0], "li-redonas-ĝin.flac" ),
+                ( 38, "ili-ĉiuj-trinkas-limonadon.flac" ),
+                ( sum(ENTRY_TIME) + 2, "fino.flac" ) ]
+
 def rotate_point(angle, x, y):
     s = math.sin(angle)
     c = math.cos(angle)
@@ -96,6 +112,9 @@ def credit_layer_name(credit_num):
         credit_num += 1
     return "#layer{}".format(credit_num + 1)
 
+def get_sound_length(sound_file):
+    return float(subprocess.check_output(["soxi", "-D", sound_file]))
+
 if len(sys.argv) == 2 and sys.argv[1] == '-p':
     play_video = True
 elif len(sys.argv) == 1:
@@ -103,6 +122,21 @@ elif len(sys.argv) == 1:
 else:
     sys.stderr.write("usage: {} [-p]\n".format(sys.argv[0]))
     sys.exit(1)
+
+if not play_video:
+    args = ["sox"]
+    args.extend(map(lambda x: x[1], AUDIO_TIMES))
+    args.extend(["audio.flac", "pad"])
+
+    current_pos = 0.0
+    for i in range(len(AUDIO_TIMES) - 1):
+        sound_length = get_sound_length(AUDIO_TIMES[i][1])
+        current_pos += sound_length
+        args.append("{}@{}".format(AUDIO_TIMES[i + 1][0] -
+                                   AUDIO_TIMES[i][0] - sound_length,
+                                   current_pos))
+
+    subprocess.check_call(args)
 
 elephant_svg = Rsvg.Handle.new_from_file('elephant.svg')
 credits_svg = Rsvg.Handle.new_from_file('credits.svg')

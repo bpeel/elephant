@@ -244,11 +244,11 @@ for frame_num in range((sum(ENTRY_TIME) + 1) * FRAME_RATE):
     else:
         rotation_angle = HEAD_ROTATION * rotation_sin
 
-    frame_num = min(len(ELEPHANT_FRAMES) - 1,
-                    max(int((rotation_sin / 2.0 + 0.5) *
-                        (len(ELEPHANT_FRAMES) - 1) + 0.5), 0))
+    feet_frame_num = min(len(ELEPHANT_FRAMES) - 1,
+                         max(int((rotation_sin / 2.0 + 0.5) *
+                                 (len(ELEPHANT_FRAMES) - 1) + 0.5), 0))
 
-    render_sub(elephant_svg, cr, "#" + ELEPHANT_FRAMES[frame_num])
+    render_sub(elephant_svg, cr, "#" + ELEPHANT_FRAMES[feet_frame_num])
 
     cr.save()
     rotate_about(cr, *HEAD_CENTER, angle = rotation_angle)
@@ -315,6 +315,9 @@ for frame_num in range((sum(ENTRY_TIME) + 1) * FRAME_RATE):
         cr.restore()
 
     write_frame(ffout, surface)
+
+    if frame_num == 0:
+        surface.write_to_png('title.png')
 
 ffout.stdin.close()
 

@@ -145,7 +145,7 @@ else:
 
 ffout = subprocess.Popen(args, stdin = subprocess.PIPE)
 
-n_main_frames = (sum(ENTRY_TIME) + 1) * FRAME_RATE
+n_main_frames = (sum(ENTRY_TIME) + 2) * FRAME_RATE
 
 for frame_num in range(n_main_frames):
     elapsed_time = frame_num / FRAME_RATE

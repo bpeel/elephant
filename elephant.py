@@ -62,7 +62,7 @@ TITLE_FADE_TIME = 0.5
 
 CREDIT_TIME = 3
 CREDIT_SLIDE_TIME = 1
-N_CREDITS = 4
+N_CREDITS = 5
 
 def rotate_point(angle, x, y):
     s = math.sin(angle)
@@ -92,7 +92,7 @@ def write_frame(ffout, surface):
     os.unlink('result.png')
 
 def credit_layer_name(credit_num):
-    if credit_num == 3:
+    if credit_num >= 3:
         credit_num += 1
     return "#layer{}".format(credit_num + 1)
 

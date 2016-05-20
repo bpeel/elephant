@@ -115,6 +115,13 @@ def credit_layer_name(credit_num):
 def get_sound_length(sound_file):
     return float(subprocess.check_output(["soxi", "-D", sound_file]))
 
+def format_subtitle_time(timestamp):
+    return ("{:02d}:{:02d}:{:02d},{:03d}"
+            .format(int(timestamp / 360),
+                    int(timestamp / 60) % 60,
+                    int(timestamp) % 60,
+                    int(timestamp * 1000) % 1000))
+
 if len(sys.argv) == 2 and sys.argv[1] == '-p':
     play_video = True
 elif len(sys.argv) == 1:
@@ -137,6 +144,19 @@ if not play_video:
                                    current_pos))
 
     subprocess.check_call(args)
+
+with open("rough-subtitles.srt", mode="w", encoding="utf-8") as srt_out:
+    i = 1
+    for audio in AUDIO_TIMES:
+        sound_end = audio[0] + get_sound_length(audio[1])
+        srt_out.write("{}\n"
+                      "{} --> {}\n"
+                      "{}\n"
+                      "\n".format(i,
+                                  format_subtitle_time(audio[0]),
+                                  format_subtitle_time(sound_end),
+                                  audio[1]))
+        i += 1
 
 elephant_svg = Rsvg.Handle.new_from_file('elephant.svg')
 credits_svg = Rsvg.Handle.new_from_file('credits.svg')

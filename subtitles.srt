@@ -11,11 +11,11 @@ Jen elefanto.
 La elefanto havas balonon.
 
 4
-00:00:06,500 --> 00:00:08,818
+00:00:07,500 --> 00:00:09,818
 Ho! La balono malaperis!
 
 5
-00:00:10,000 --> 00:00:11,674
+00:00:11,000 --> 00:00:12,674
 Kie estas la balono?
 
 6

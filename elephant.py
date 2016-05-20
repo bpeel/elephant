@@ -25,20 +25,20 @@ BALLOON_NOSE_POINT = (619, 221)
 
 RHINO_TAIL_POINT = (1496, 651)
 RHINO_TAIL_ROTATION = 5.0 * math.pi / 180.0
-RHINO_POS = WIDTH * 1.5
+RHINO_POS = WIDTH * 1.5 + 900
 
 RHINO_ENTRY_START = -2343
 RHINO_ENTRY_END = -1477
 
-ALLIGATOR_POS = WIDTH * 3.0
+ALLIGATOR_POS = WIDTH * 3.0 + 900
 ALLIGATOR_HEAD_POINT = (1026, 357)
 ALLIGATOR_ROTATION = 30.0 * math.pi / 180.0
-ALLIGATOR_ROTATE_TIME = (22, 3)
+ALLIGATOR_ROTATE_TIME = (25, 3)
 
 ALLIGATOR_ENTRY_START = 1115
-ENTRY_TIME = (34, 3)
+ENTRY_TIME = (37, 3)
 
-MONKEY_POS = WIDTH * 4.0
+MONKEY_POS = WIDTH * 4.0 + 900
 MONKEY_HAND_POINT = (1150, 870)
 MONKEY_HOLD_POINT = (1015, 395)
 MONKEY_ROTATION = 10.0 * math.pi / 180.0
@@ -49,13 +49,16 @@ FOREGROUND_SIZE = 4038.071
 
 MEZGROUND_SIZE = 3070
 
-BALLOON_DISAPPEAR_TIME = 3.0
+BALLOON_DISAPPEAR_TIME = 6.0
 # Pixels per secqond per second
 BALLOON_ACCELERATION = HEIGHT / 2
 
-BALLOON_PASSOVER_TIME = (32, 1)
+BALLOON_PASSOVER_TIME = (35, 1)
 
-PAUSES = [(11, 3), (22, 3), (32, 300)]
+PAUSES = [(14, 3), (25, 3), (35, 300)]
+
+TITLE_TIME = 3
+TITLE_FADE_TIME = 0.5
 
 def rotate_point(angle, x, y):
     s = math.sin(angle)
@@ -93,6 +96,20 @@ else:
     sys.exit(1)
 
 elephant_svg = Rsvg.Handle.new_from_file('elephant.svg')
+
+title_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
+                                   WIDTH // SCALE,
+                                   HEIGHT // SCALE)
+cr = cairo.Context(title_surface)
+cr.scale(1.0 / SCALE, 1.0 / SCALE)
+cr.save()
+cr.set_source_rgba(0.0, 0.0, 0.0, 0.0)
+cr.set_operator(cairo.OPERATOR_SOURCE)
+cr.paint()
+cr.restore()
+render_sub(elephant_svg, cr, "#layer10")
+
+title_pattern = cairo.SurfacePattern(title_surface)
 
 surface = cairo.ImageSurface(cairo.FORMAT_RGB24,
                              WIDTH // SCALE,
@@ -284,6 +301,18 @@ for frame_num in range((sum(ENTRY_TIME) + 1) * FRAME_RATE):
     cr.translate(FOREGROUND_SIZE, 0.0)
     render_sub(elephant_svg, cr, "#layer5")
     cr.restore()
+
+    if elapsed_time < TITLE_TIME + TITLE_FADE_TIME:
+        cr.save()
+        identity_matrix = cairo.Matrix()
+        cr.set_matrix(identity_matrix)
+        cr.set_source(title_pattern)
+        if elapsed_time >= TITLE_TIME:
+            cr.paint_with_alpha(1.0 - (elapsed_time - TITLE_TIME) /
+                                TITLE_FADE_TIME)
+        else:
+            cr.paint()
+        cr.restore()
 
     write_frame(ffout, surface)
 

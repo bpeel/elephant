@@ -1,0 +1,52 @@
+1
+00:00:00,000 --> 00:00:01,906
+La elefanto kaj la balono
+
+2
+00:00:03,000 --> 00:00:04,390
+Jen elefanto.
+
+3
+00:00:04,400 --> 00:00:06,486
+La elefanto havas balonon.
+
+4
+00:00:06,500 --> 00:00:08,818
+Ho! La balono malaperis!
+
+5
+00:00:10,000 --> 00:00:11,674
+Kie estas la balono?
+
+6
+00:00:14,000 --> 00:00:16,292
+Ĉu ĝi estas malantaŭ la rinocero?
+
+7
+00:00:17,000 --> 00:00:17,643
+Ne.
+
+8
+00:00:25,000 --> 00:00:27,704
+Ĉu ĝi estas en la buŝo de la aligatoro?
+
+9
+00:00:28,000 --> 00:00:28,540
+Ne.
+
+10
+00:00:32,000 --> 00:00:34,831
+Ho! La simio havas ĝin en la arbo.
+
+11
+00:00:35,000 --> 00:00:36,326
+Li redonas ĝin.
+
+12
+00:00:38,000 --> 00:00:39,949
+Ili ĉiuj trinkas limonadon.
+
+13
+00:00:42,000 --> 00:00:42,743
+Fino.
+

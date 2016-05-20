@@ -47,7 +47,7 @@ ELEPHANT_FRAMES = ["layer2", "g4209", "layer1"]
 
 FOREGROUND_SIZE = 4038.071
 
-MEZGROUND_SIZE = 3070
+MEZGROUND_SIZE = 3134
 
 BALLOON_DISAPPEAR_TIME = 6.0
 # Pixels per secqond per second

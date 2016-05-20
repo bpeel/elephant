@@ -60,6 +60,10 @@ PAUSES = [(14, 3), (25, 3), (35, 300)]
 TITLE_TIME = 3
 TITLE_FADE_TIME = 0.5
 
+CREDIT_TIME = 3
+CREDIT_SLIDE_TIME = 1
+N_CREDITS = 4
+
 def rotate_point(angle, x, y):
     s = math.sin(angle)
     c = math.cos(angle)
@@ -87,6 +91,11 @@ def write_frame(ffout, surface):
         raise Exception("convert failed")
     os.unlink('result.png')
 
+def credit_layer_name(credit_num):
+    if credit_num == 3:
+        credit_num += 1
+    return "#layer{}".format(credit_num + 1)
+
 if len(sys.argv) == 2 and sys.argv[1] == '-p':
     play_video = True
 elif len(sys.argv) == 1:
@@ -96,6 +105,7 @@ else:
     sys.exit(1)
 
 elephant_svg = Rsvg.Handle.new_from_file('elephant.svg')
+credits_svg = Rsvg.Handle.new_from_file('credits.svg')
 
 title_surface = cairo.ImageSurface(cairo.FORMAT_ARGB32,
                                    WIDTH // SCALE,
@@ -318,6 +328,31 @@ for frame_num in range((sum(ENTRY_TIME) + 1) * FRAME_RATE):
 
     if frame_num == 0:
         surface.write_to_png('title.png')
+
+for frame_num in range((CREDIT_TIME * N_CREDITS +
+                        CREDIT_SLIDE_TIME * (N_CREDITS - 1)) *
+                       FRAME_RATE):
+    elapsed_time = frame_num / FRAME_RATE
+    credit_num = int(elapsed_time / (CREDIT_TIME + CREDIT_SLIDE_TIME))
+    in_credit_time = elapsed_time % (CREDIT_TIME + CREDIT_SLIDE_TIME)
+
+    cr.set_source_rgb(170 / 255, 170 / 255, 255 / 255)
+    cr.paint()
+    
+    if in_credit_time < CREDIT_TIME:
+        render_sub(credits_svg, cr, credit_layer_name(credit_num))
+    else:
+        slide_fraction = (-math.cos((in_credit_time - CREDIT_TIME) *
+                                    math.pi / CREDIT_SLIDE_TIME) /
+                          2.0 + 0.5)
+        cr.save()
+        cr.translate(0.0, -slide_fraction * HEIGHT)
+        render_sub(credits_svg, cr, credit_layer_name(credit_num))
+        cr.translate(0.0, HEIGHT)
+        render_sub(credits_svg, cr, credit_layer_name(credit_num + 1))
+        cr.restore()
+        
+    write_frame(ffout, surface)
 
 ffout.stdin.close()
 

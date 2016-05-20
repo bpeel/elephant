@@ -145,7 +145,9 @@ else:
 
 ffout = subprocess.Popen(args, stdin = subprocess.PIPE)
 
-for frame_num in range((sum(ENTRY_TIME) + 1) * FRAME_RATE):
+n_main_frames = (sum(ENTRY_TIME) + 1) * FRAME_RATE
+
+for frame_num in range(n_main_frames):
     elapsed_time = frame_num / FRAME_RATE
 
     camera_time = elapsed_time
@@ -329,9 +331,11 @@ for frame_num in range((sum(ENTRY_TIME) + 1) * FRAME_RATE):
     if frame_num == 0:
         surface.write_to_png('title.png')
 
-for frame_num in range((CREDIT_TIME * N_CREDITS +
-                        CREDIT_SLIDE_TIME * (N_CREDITS - 1)) *
-                       FRAME_RATE):
+n_credit_frames = ((CREDIT_TIME * N_CREDITS +
+                    CREDIT_SLIDE_TIME * (N_CREDITS - 1)) *
+                   FRAME_RATE)
+
+for frame_num in range(n_credit_frames):
     elapsed_time = frame_num / FRAME_RATE
     credit_num = int(elapsed_time / (CREDIT_TIME + CREDIT_SLIDE_TIME))
     in_credit_time = elapsed_time % (CREDIT_TIME + CREDIT_SLIDE_TIME)
@@ -352,6 +356,10 @@ for frame_num in range((CREDIT_TIME * N_CREDITS +
         render_sub(credits_svg, cr, credit_layer_name(credit_num + 1))
         cr.restore()
         
+    write_frame(ffout, surface)
+
+# Pad out to exactly the length of the music
+for i in range(n_credit_frames + n_main_frames, int(63.31 * FRAME_RATE)):
     write_frame(ffout, surface)
 
 ffout.stdin.close()

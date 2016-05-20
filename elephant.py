@@ -12,7 +12,7 @@ import shutil
 import os
 import sys
 
-SCALE = 4
+SCALE = 1
 WIDTH = 1920
 HEIGHT = 1080
 
